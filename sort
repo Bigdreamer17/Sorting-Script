@@ -1,21 +1,22 @@
 #!/bin/bash
 
-while getopts "d:m:" opt; do 
-  case $opt in
-    d) directory="$OPTARG"
-    ;;
-    \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
-  esac
-done
+print_help () {
+  echo -e "\e[36mUsage: ./sort [OPTIONS]
 
-#Check if directory was given
-if [ -z "$directory" ]; then
-  echo "Error: You must provide a directory with -d"
-  exit 1
-fi
+Organize files in a directory by type.
 
-# Go to directory
-cd "$directory" || { echo "Cannot cd to $directory"; exit 1; }
+Options:
+  -d <directory>     Target directory (default: current directory)
+  -m <mode>          Sort mode: all, audio, ebook, video, presentation, zip, json, image
+  -h                 Show this help message
+
+Examples:
+  ./sort
+  ./sort -d ~/Downloads
+  ./sort -m image
+  ./sort -d ~/Desktop -m zip
+\e[0m"
+}
 
 sort_by_E_Books () {
   if [ ! -d "E-Books" ]; then
@@ -96,11 +97,45 @@ sort_by_json () {
   done
 }
 
-echo -e "Wellcome your directory is: $directory"
-sort_by_E_Books
-sort_by_video
-sort_by_presentations
-sort_by_image
-sort_by_zip
-sort_by_audio
-sort_by_json
+# CLI Option Parsing
+while getopts "d:m:h" opt; do 
+  case $opt in
+    d) directory="$OPTARG"
+    ;;
+    m) mode="$OPTARG"
+    ;;
+    h) print_help; exit 0 ;;   
+    \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
+  esac
+done
+
+directory="${directory:-.}"
+cd "$directory" || { echo "Cannot cd to $directory"; exit 1; }
+
+
+echo -e "\e[34m📁 Sorting in directory: $directory\e[0m"
+
+# Mode Execution
+case $mode in
+  all)
+    sort_by_E_Books
+    sort_by_image
+    sort_by_video
+    sort_by_json
+    sort_by_presentations
+    sort_by_zip
+    sort_by_audio
+  ;;
+  audio) sort_by_audio;;
+  ebook) sort_by_E_Books;;
+  video) sort_by_video;;
+  presentation) sort_by_presentations;;
+  zip) sort_by_zip;;
+  json) sort_by_json;;
+  image) sort_by_image;;
+  *) 
+    echo "❌ Invalid mode: $mode"
+    echo "Run with -h for help."
+    exit 1
+    ;;
+esac
