@@ -1,0 +1,106 @@
+#!/bin/bash
+
+while getopts "d:m:" opt; do 
+  case $opt in
+    d) directory="$OPTARG"
+    ;;
+    \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
+  esac
+done
+
+#Check if directory was given
+if [ -z "$directory" ]; then
+  echo "Error: You must provide a directory with -d"
+  exit 1
+fi
+
+# Go to directory
+cd "$directory" || { echo "Cannot cd to $directory"; exit 1; }
+
+sort_by_E_Books () {
+  if [ ! -d "E-Books" ]; then
+    mkdir "E-Books"
+  fi
+  for file in *.txt *.pdf *.epub *.csv *.docx *.doc; do
+    if [ -f "$file" ]; then
+     mv "$file" "E-Books"
+    fi  
+  done 
+}
+
+sort_by_image () {
+  if [ ! -d "Pics" ]; then
+   mkdir "Pics" 
+  fi 
+  for file in *.png *.jpeg *.jpg *.JPG *svg; do 
+    if [ -f "$file" ]; then
+      mv "$file" "Pics"
+    fi 
+  done
+}
+
+sort_by_presentations () {
+  if [ ! -d "Presentations" ]; then
+   mkdir "Presentations" 
+  fi 
+
+  for file in *.pptx *.xlsx *.xls; do 
+    if [ -f "$file" ]; then
+      mv "$file" "Presentations"
+    fi 
+  done
+}
+
+sort_by_video () {
+  if [ ! -d "Vids" ]; then
+   mkdir "Vids"
+  fi 
+
+  for file in *.mp4 *.mkv *.webm; do 
+    if [ -f "$file" ]; then
+      mv "$file" "Vids"
+    fi 
+  done
+}
+sort_by_zip () {
+  if [ ! -d "Zipped" ]; then
+   mkdir "Zipped" 
+  fi 
+
+  for file in *.zip *.tar.xz *.rpm *.jar *.bz2 *deb; do 
+    if [ -f "$file" ]; then
+      mv "$file" "Zipped"
+    fi 
+  done
+}
+sort_by_audio () {
+  if [ ! -d "Audio" ]; then
+    mkdir "Audio"
+  fi 
+
+  for file in *.mp4 *m4a; do 
+    if [ -f "$file" ]; then
+      mv "$file" "Audio"
+    fi
+  done
+}
+sort_by_json () {
+  if [ ! -d "Json" ]; then
+    mkdir "Json"
+  fi 
+
+  for file in *json; do 
+    if [ -f "$file" ]; then
+      mv "$file" "Json"
+    fi 
+  done
+}
+
+echo -e "Wellcome your directory is: $directory"
+sort_by_E_Books
+sort_by_video
+sort_by_presentations
+sort_by_image
+sort_by_zip
+sort_by_audio
+sort_by_json
